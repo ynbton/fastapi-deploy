@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>FastAPI Veri Yönetimi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      color: #2c3e50;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    .input-group {
+      margin-bottom: 18px;
+    }
+    label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #34495e;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: 0.3s;
+    }
+    input:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 6px rgba(52,152,219,0.4);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #3498db;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #2980b9; }
+    #output {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 14px;
+      font-family: monospace;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ FastAPI Veri Yönetimi</h1>
+
+    <div class="card">
+      <div class="input-group">
+        <label>Anahtar:</label>
+        <input type="text" id="keyInput" placeholder="Anahtar gir...">
+      </div>
+      <div class="input-group">
+        <label>Değer:</label>
+        <input type="text" id="valueInput" placeholder="Değer gir...">
+      </div>
+      <button onclick="setData()">Kaydet</button>
+    </div>
+
+    <div class="card">
+      <div class="input-group">
+        <label>Veri oku (anahtar):</label>
+        <input type="text" id="getKey" placeholder="Anahtar gir...">
+      </div>
+      <button onclick="getData()">Oku</button>
+      <pre id="output"></pre>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://sonic-cruz-carries-ranch.trycloudflare.com";
+
+    async function setData() {
+      const key = document.getElementById("keyInput").value;
+      const value = document.getElementById("valueInput").value;
+      if(!key || !value) return alert("Hem anahtar hem değer gerekli!");
+      try {
+        const res = await fetch(`${API}/set/${key}`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({value})
+        });
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      } catch(e) {
+        document.getElementById("output").textContent = "❌ Sunucuya bağlanılamadı!";
+      }
+    }
+
+    async function getData() {
+      const key = document.getElementById("getKey").value;
+      if(!key) return alert("Anahtar gerekli!");
+      try {
+        const res = await fetch(`${API}/get/${key}`);
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      } catch(e) {
+        document.getElementById("output").textContent = "❌ Sunucuya bağlanılamadı!";
+      }
+    }
+  </script>
+</body>
+</html>
